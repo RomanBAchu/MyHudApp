@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spider-Man HUD</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Видео с камеры -->
+    <video id="webcam" autoplay playsinline></video>
+
+    <!-- Полноэкранный интерфейс (Стекло) -->
+    <div class="mission-card full-screen">
+        <div class="scanner-line"></div>
+        
+        <!-- Данные погоды (Слева) -->
+        <div class="hud-left">
+            <div id="weather-data">СЕНСОРЫ: ЗАГРУЗКА...</div>
+        </div>
+
+        <!-- Мировые новости (Справа) -->
+        <div class="hud-right">
+            <header>
+                <h2>МИРОВЫЕ СОБЫТИЯ</h2>
+            </header>
+            <ul class="objectives" id="rss-news">
+                <li>СИНХРОНИЗАЦИЯ С СЕТЬЮ...</li>
+            </ul>
+        </div>
+
+        <!-- Декоративные углы визора -->
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
