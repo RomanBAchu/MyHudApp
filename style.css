@@ -1,67 +1,364 @@
-body, html { 
-    margin: 0; 
-    padding: 0; 
-    background: #000; 
-    overflow: hidden; 
-    font-family: 'Segoe UI', Tahoma, sans-serif; 
+/* Базовые настройки */
+body, html {
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
+/* Видео с камеры */
 #webcam {
-    position: fixed; 
-    width: 100vw; 
-    height: 100vh;
-    object-fit: cover;
-    z-index: 1;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 1;
 }
 
-/* Эффект стекла на весь экран */
+/* Полноэкранный HUD */
 .mission-card.full-screen {
-    position: fixed; 
-    top: 0; 
-    left: 0;
-    width: 100vw; 
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.3); 
-    color: white;
-    z-index: 10;
-    pointer-events: none; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  z-index: 10;
+  pointer-events: none;
 }
 
-/* Блоки данных */
-.hud-left { position: absolute; top: 50px; left: 50px; width: 220px; }
-.hud-right { position: absolute; top: 50px; right: 50px; width: 350px; text-align: right; }
+/* Блоки данных HUD */
+.hud-left {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  width: 220px;
+}
+
+.hud-right {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  width: 350px;
+  text-align: right;
+}
 
 /* Бегущая линия сканера */
 .scanner-line {
-    position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-    background: rgba(0, 242, 255, 0.6);
-    box-shadow: 0 0 15px #00f2ff;
-    animation: scan 5s infinite linear;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 242, 255, 0.6);
+  box-shadow: 0 0 15px #00f2ff;
+  animation: scan 5s infinite linear;
 }
 
-h2 { font-size: 16px; letter-spacing: 3px; color: #00f2ff; margin-bottom: 15px; text-transform: uppercase; }
+/* Стили заголовков */
+h2 {
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: #00f2ff;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
 
-.objectives { list-style: none; padding: 0; font-size: 14px; }
-.objectives li { margin: 12px 0; opacity: 0.7; line-height: 1.3; text-transform: uppercase; }
-.objectives li.active { color: #00f2ff; font-weight: bold; opacity: 1; text-shadow: 0 0 8px #00f2ff; }
+/* Список новостей */
+.objectives {
+  list-style: none;
+  padding: 0;
+  font-size: 14px;
+}
 
-/* Рамки по углам */
+.objectives li {
+  margin: 12px 0;
+  opacity: 0.7;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.objectives li.active {
+  color: #00f2ff;
+  font-weight: bold;
+  opacity: 1;
+  text-shadow: 0 0 8px #00f2ff;
+}
+
+/* Декоративные углы визора */
 .corner {
-    position: absolute; width: 40px; height: 40px;
-    border: 2px solid rgba(0, 242, 255, 0.3);
-}
-.top-left { top: 25px; left: 25px; border-right: 0; border-bottom: 0; }
-.top-right { top: 25px; right: 25px; border-left: 0; border-bottom: 0; }
-.bottom-left { bottom: 25px; left: 25px; border-right: 0; border-top: 0; }
-.bottom-right { bottom: 25px; right: 25px; border-left: 0; border-top: 0; }
-
-@keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-
-@media (max-width: 768px) {
-    .hud-left, .hud-right {
-        font-size: 12px;
-        padding: 10px;
-    }
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(0, 242, 255, 0.3);
 }
 
+.top-left {
+  top: 25px;
+  left: 25px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.top-right {
+  top: 25px;
+  right: 25px;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.bottom-left {
+  bottom: 25px;
+  left: 25px;
+  border-right: 0;
+  border-top: 0;
+}
+
+.bottom-right {
+  bottom: 25px;
+  right: 25px;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* Анимация сканера */
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* Мини‑карта */
+#mini-map {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 250px;
+  height: 250px;
+  
+  
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+#map-canvas {
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(to right, #333 1px, transparent 1px),
+    linear-gradient(to bottom, #333 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+#player-marker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: #ff3b30;
+  border: 2px solid white;
+  border-radius: 50%;
+  transform: translate(-350%, -350%);
+  z-index: 10;
+  box-shadow: 0 0 8px #ff3b30;
+}
+
+/* Центрирование элементов */
+#rss-news, #weather-data {
+  text-align: center;
+  padding: 10px;
+}
+
+.weather-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-temp {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.weather-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  font-size: 12px;
+  color: #ccc;
+}
+/* Адаптивность для разных размеров экранов */
+
+/* Планшеты и небольшие ноутбуки (768–1024 px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .hud-left {
+    top: 30px;
+    left: 30px;
+    width: 200px;
+  }
+  .hud-right {
+    top: 30px;
+    right: 30px;
+    width: 300px;
+  }
+  #mini-map {
+    bottom: 15px;
+    left: 15px;
+    width: 220px;
+    height: 220px;
+  }
+  .weather-temp {
+    font-size: 22px;
+  }
+  .weather-details {
+    font-size: 11px;
+    gap: 12px;
+  }
+}
+
+/* Мобильные устройства (480–768 px) — портретный режим */
+@media (max-width: 768px) and (orientation: portrait) {
+  /* Позиционирование HUD-блоков */
+  .hud-left,
+  .hud-right {
+    position: relative;
+    top: 16px;
+    left: auto;
+    right: auto;
+    width: calc(100% - 40px);
+    margin: 0 auto 20px auto;
+    padding: 8px 15px;
+    text-align: center;
+    border-radius: 8px;
+  }
+
+  /* Мини‑карта — перемещаем в центр внизу */
+  #mini-map {
+    position: fixed;
+    bottom: 7px;
+    left: 30%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 150px;
+    max-height: 150px;
+    height: 100%;
+    border-radius: 50%;
+  }
+
+  /* Корректировка размеров элементов внутри мини‑карты */
+  #map-canvas {
+    background-size: 15px 15px; /* более плотная сетка */
+  }
+
+  #player-marker {
+    width: 10px;
+    height: 10px;
+    border-width: 3px;
+  }
+
+  /* Стили новостей */
+  #rss-news {
+    padding: 15px 10px;
+  }
+  .objectives {
+    font-size: 13px;
+  }
+  .objectives li {
+    margin: 8px 0;
+    line-height: 1.2;
+  }
+  .objectives li.active {
+    text-shadow: 0 0 5px #00f2ff;
+  }
+
+  /* Погода */
+  .weather-info {
+    gap: 6px;
+  }
+  .weather-temp {
+    font-size: 20px;
+  }
+  .weather-details {
+    font-size: 11px;
+    gap: 10px;
+  }
+  .weather-details span {
+    padding: 3px 6px;
+  }
+
+  /* Декоративные углы — скрываем или уменьшаем */
+  .corner {
+    display: none; /* скрываем углы на мобильных */
+  }
+
+  /* Сканер — уменьшаем высоту */
+  .scanner-line {
+    height: 1px;
+  }
+}
+
+/* Мобильные устройства в ландшафтном режиме (320–480 px по высоте) */
+@media (max-height: 480px) and (orientation: landscape) {
+  .mission-card.full-screen {
+    overflow-y: auto;
+  }
+  .hud-left,
+  .hud-right {
+    font-size: 10px;
+    padding: 5px 8px;
+  }
+  #mini-map {
+    bottom: 5px;
+    left: 5px;
+    width: 180px;
+    height: 180px;
+  }
+  .weather-temp {
+    font-size: 16px;
+  }
+  .objectives {
+    font-size: 11px;
+  }
+}
+
+/* Очень маленькие экраны (до 360 px ширины) */
+@media (max-width: 360px) {
+  .hud-left,
+  .hud-right {
+    width: calc(100% - 20px);
+    padding: 6px 10px;
+  }
+  #mini-map {
+    width: 85vw;
+    height: 250px;
+  }
+  .weather-temp {
+    font-size: 18px;
+  }
+  .weather-details {
+    flex-direction: column;
+    align-items: center;
+  }
+  .objectives li {
+    font-size: 12px;
+    margin: 6px 0;
+  }
+  h2 {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+}
+
+/* Для устройств с поддержкой тач‑событий */
+@media (hover: none) and (pointer: coarse) {
+  .hud-left,
+  .hud-right {
+    touch-action: manipulation;
+  }
+}

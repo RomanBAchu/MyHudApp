@@ -1,139 +1,124 @@
 // Ждём загрузки DOM перед выполнением кода
 document.addEventListener('DOMContentLoaded', function() {
-    const video = document.getElementById('webcam');
+  const video = document.getElementById('webcam');
+  const playerMarker = document.getElementById('player-marker');
+  const weatherContainer = document.getElementById('weather-data');
 
-    // 1. Включение камеры
-    async function startCamera() {
-        if (!video) {
-            console.error("Элемент #webcam не найден в DOM");
-            return;
-        }
+  // 1. Включение камеры
+  async function startCamera() {
+    if (!video) return;
 
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: "environment",
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            });
-            video.srcObject = stream;
-        } catch (err) {
-            console.error("Камера не найдена:", err);
-            if (video) {
-                video.style.display = 'none';
-            }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         }
+      });
+      video.srcObject = stream;
+    } catch (err) {
+      if (video) video.style.display = 'none';
     }
+  }
 
-    // 2. Новости (RSS через прокси) с несколькими источниками
-    async function updateNews() {
-        // Список бесплатных RSS‑лент
-        const rssSources = [
-            'https://www.vesti.ru/rss.xml',
-            'https://ria.ru/export/rss2/index.xml',
-            'https://www.rbc.ru/rss',
-            'https://tass.ru/rss/v2.xml',
-            'https://lenta.ru/rss',
-            'https://www.kommersant.ru/RSS/news.xml'
-        ];
-
-        for (const rssUrl of rssSources) {
-            try {
-                // Используем прокси для преобразования RSS в JSON
-                const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-                const response = await fetch(proxyUrl);
-
-                if (!response.ok) {
-                    console.warn(`Источник ${rssUrl} недоступен, пробуем следующий...`);
-                    continue;
-                }
-
-                const data = await response.json();
-
-                if (data.status === 'ok' && data.items.length > 0) {
-                    displayNews(data);
-                    return; // Успех — выходим из цикла
-                }
-            } catch (e) {
-                console.warn(`Ошибка при загрузке ${rssUrl}:`, e);
-                continue;
-            }
-        }
-
-        // Если все источники не сработали
-        const newsContainer = document.getElementById('rss-news');
-        if (newsContainer) {
-            newsContainer.innerHTML = '<li>СИНХРОНИЗАЦИЯ ПРЕРВАНА</li>';
-        }
-    }
-
-    function displayNews(data) {
-        const container = document.getElementById('rss-news');
-        if (!container) return;
-
-        container.innerHTML = ''; // Очистка
-
-        // Берём первые 6 новостей
-        data.items.slice(0, 6).forEach((item, i) => {
-            const li = document.createElement('li');
-            li.className = i === 0 ? 'active' : ''; // Первая новость — активная
-            li.textContent = item.title.substring(0, 100) + (item.title.length > 100 ? '...' : '');
-            container.appendChild(li);
-        });
-    }
-
-    // 3. Погода по координатам
-   async function updateNews() {
+  // 2. Новости с ваших RSS‑каналов
+  async function updateNews() {
     const rssSources = [
-        'https://www.vesti.ru/rss.xml',
-        'https://ria.ru/export/rss2/index.xml',
-        // ... остальные источники
+      'https://tass.ru/rss/v2.xml',
+      'http://lgz.ru/rss.xml',
+      'http://asn24.ru/news/rss.php',
+      'http://www.dvizhok.su/rss/',
+      'https://www.sports.ru/rss/all_news'
     ];
 
-    let success = false;
-
     for (const rssUrl of rssSources) {
-        try {
-            const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-            const response = await fetch(proxyUrl);
+      try {
+        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+        const response = await fetch(proxyUrl);
 
-            if (!response.ok) {
-                console.warn(`Источник ${rssUrl} вернул статус ${response.status}`);
-                continue;
-            }
+        if (!response.ok) continue;
 
-            const data = await response.json();
-
-            if (data.status === 'ok' && data.items.length > 0) {
-                displayNews(data);
-                success = true;
-                break; // Успех — выходим из цикла
-            } else {
-                console.warn(`Данные из ${rssUrl} некорректны:`, data);
-            }
-        } catch (e) {
-            console.error(`Критическая ошибка при загрузке ${rssUrl}:`, e);
+        const data = await response.json();
+        if (data.status === 'ok' && data.items.length > 0) {
+          displayNews(data);
+          return;
         }
+      } catch (e) {
+        continue;
+      }
     }
 
-    if (!success) {
-        const newsContainer = document.getElementById('rss-news');
-        if (newsContainer) {
-            newsContainer.innerHTML = '<li>СИНХРОНИЗАЦИЯ ПРЕРВАНА</li>';
-        }
+    const newsContainer = document.getElementById('rss-news');
+    if (newsContainer) {
+      newsContainer.innerHTML = '<li>СИНХРОНИЗАЦИЯ ПРЕРВАНА</li>';
     }
-}
+  }
 
+  function displayNews(data) {
+    const container = document.getElementById('rss-news');
+    if (!container) return;
 
-    // Запуск всех систем
-    startCamera();
-    updateNews();
-    updateWeather();
+    container.innerHTML = '';
+    data.items.slice(0, 6).forEach((item, i) => {
+      const li = document.createElement('li');
+      li.className = i === 0 ? 'active' : '';
+      li.textContent = item.title.substring(0, 100) + (item.title.length > 100 ? '...' : '');
+      container.appendChild(li);
+    });
+  }
 
-    // Обновление раз в 5 минут (300 000 мс)
-    setInterval(() => {
-        updateNews();
-        updateWeather();
-    }, 300000);
+  // 3. Погода через Open‑Meteo (без API‑ключа)
+  async function updateWeather() {
+    try {
+      const latitude = 55.7558; // Москва
+      const longitude = 37.6176;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=Europe/Moscow`;
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (response.ok) {
+        displayWeather(data);
+      } else {
+        weatherContainer.innerHTML = 'ДАННЫЕ О ПОГОДЕ НЕДОСТУПНЫ';
+      }
+    } catch (error) {
+      weatherContainer.innerHTML = 'ОШИБКА ЗАГРУЗКИ ПОГОДЫ';
+    }
+  }
+
+  function displayWeather(data) {
+    const temp = data.current.temperature_2m.toFixed(1);
+    const humidity = data.current.relative_humidity_2m;
+    const windSpeed = (data.current.wind_speed_10m * 3.6).toFixed(1); // м/с в км/ч
+
+    weatherContainer.innerHTML = `
+      <div class="weather-info">
+        <div class="weather-temp">${temp}°C</div>
+        <div class="weather-details">
+          <span>Влажность: ${humidity}%</span>
+          <span>Ветер: ${windSpeed} км/ч</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // 4. Мини‑карта
+  function updatePlayerPosition(x, y) {
+    const mapWidth = 250, mapHeight = 250;
+    const centerX = mapWidth / 2, centerY = mapHeight / 2;
+    playerMarker.style.left = `${centerX + (x * 10)}px`;
+    playerMarker.style.top = `${centerY - (y * 10)}px`;
+  }
+
+  // Запуск систем
+  startCamera();
+  updateNews();
+  updateWeather();
+  updatePlayerPosition(0, 0);
+
+  // Периодическое обновление
+  setInterval(updateNews, 1800000);  // Каждые 3 минуты
+  setInterval(updateWeather, 600000); // Каждые 10 минут
 });
