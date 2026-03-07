@@ -6,21 +6,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 1. Включение камеры
   async function startCamera() {
-    if (!video) return;
+  if (!video) return;
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      });
-      video.srcObject = stream;
-    } catch (err) {
-      if (video) video.style.display = 'none';
+  const isMobile = window.innerWidth <= 768 || window.innerHeight <= 480;
+  const constraints = {
+    video: {
+      facingMode: 'environment',
+      width: { ideal: isMobile ? 640 : 1280 },
+      height: { ideal: isMobile ? 360 : 720 }
     }
+  };
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
+  } catch (err) {
+    if (video) video.style.display = 'none';
   }
+}
+
 
   // 2. Новости с ваших RSS‑каналов
   async function updateNews() {
